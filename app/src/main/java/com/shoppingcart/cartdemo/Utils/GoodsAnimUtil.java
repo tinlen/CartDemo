@@ -1,5 +1,6 @@
 package com.shoppingcart.cartdemo.Utils;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -27,8 +28,11 @@ public class GoodsAnimUtil {
      */
     private static ViewGroup anim_mask_layout;
     private static Activity mActivity;
+    private static View mBuy;
     private static View mImgcar;
     private static OnEndAnimListener onEndAnimListener;
+    private static ImageView bugImg;
+
     /**
      * 动画结束之后的接口
      */
@@ -40,13 +44,14 @@ public class GoodsAnimUtil {
     }
 
     public static void setAnim(Activity activity ,View imphoto,View imgcar){
+        mBuy = imphoto;
         mActivity = activity;
         mImgcar = imgcar;
         //存储购买按钮在屏幕的坐标
         int[] start_location = new int[2];
         imphoto.getLocationInWindow(start_location);
         int[] start_location1 = new int[]{start_location[0],start_location[1]};
-        ImageView bugImg = new ImageView(mActivity);
+        bugImg = new ImageView(mActivity);
         bugImg.setImageResource(R.mipmap.aii);
         //开始执行动画
         startAnim(bugImg, start_location1);
@@ -67,8 +72,8 @@ public class GoodsAnimUtil {
         startPointF.x = start_location[0];
         startPointF.y = start_location[1];
         PointF endPointF = new PointF();
-        endPointF.x = end_location[0];
-        endPointF.y = end_location[1];
+        endPointF.x = end_location[0]+mImgcar.getWidth()/2;
+        endPointF.y = end_location[1]+mImgcar.getHeight()/2;
 
         Log.d("红点","x:"+startPointF.x+" y:"+startPointF.y);
 
@@ -76,23 +81,32 @@ public class GoodsAnimUtil {
         midPointF.x = endPointF.x;
         midPointF.y = startPointF.y;
 
-        ValueAnimator animator = getCartValueAnimator(v,startPointF,midPointF,endPointF);
-        animator.setDuration(1000);
+        ValueAnimator animator = getCartValueAnimator(v, startPointF, midPointF, endPointF);
+        animator.setDuration(1200);
         animator.start();
-    }
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
 
-    //红点动画
-    private static AnimatorSet getEnterAnimtor(final View target) {
+            }
 
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(target, View.ALPHA, 0.2f, 1f);
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(target, View.SCALE_X, 0.2f, 1f);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(target, View.SCALE_Y, 0.2f, 1f);
-        AnimatorSet enter = new AnimatorSet();
-        enter.setDuration(500);
-        enter.setInterpolator(new LinearInterpolator());
-        enter.playTogether(alpha, scaleX, scaleY);
-        enter.setTarget(target);
-        return enter;
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                //动画结束后删除红点
+                anim_mask_layout.removeAllViews();
+                onEndAnimListener.onEndAnim();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
 
     private static ValueAnimator getCartValueAnimator(View targe,PointF startP,PointF midP,PointF endP){
@@ -105,6 +119,8 @@ public class GoodsAnimUtil {
         animator.setDuration(1000);
         return animator;
     }
+
+
 
     public static class CartListener implements ValueAnimator.AnimatorUpdateListener{
 
