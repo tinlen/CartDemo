@@ -17,8 +17,14 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.mingle.entity.MenuEntity;
+import com.mingle.sweetpick.BlurEffect;
+import com.mingle.sweetpick.RecyclerViewDelegate;
+import com.mingle.sweetpick.SweetSheet;
 import com.shoppingcart.cartdemo.Adapter.CartAdapter;
 import com.shoppingcart.cartdemo.Bean.Goods;
 import com.shoppingcart.cartdemo.Utils.GoodsAnimUtil;
@@ -31,10 +37,12 @@ public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnE
 
     private TextView tvNum;
     private int num = 0;
-    private ListView lv_cartlist;
     private List<Goods> goodsList;
     private Goods goods;
     private CartAdapter adapter;
+    private ImageView iv;
+    private SweetSheet mSweetSheet;
+    private RelativeLayout rl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +53,9 @@ public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnE
 
         initData();
 
-        final ImageView iv = (ImageView) findViewById(R.id.m_list_car);
+        rl = (RelativeLayout)findViewById(R.id.rl);
+
+        iv = (ImageView) findViewById(R.id.m_list_car);
 
         tvNum = (TextView) findViewById(R.id.m_list_num);
 
@@ -53,10 +63,71 @@ public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnE
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GoodsAnimUtil.setAnim(MainActivity.this,button,iv);
+                GoodsAnimUtil.setAnim(MainActivity.this, button, iv);
             }
         });
 
+        setupRecyclerView();
+
+        iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSweetSheet.isShow()){
+                    mSweetSheet.dismiss();
+                }
+                mSweetSheet.toggle();
+            }
+        });
+
+    }
+
+    private void setupRecyclerView() {
+
+        final ArrayList<MenuEntity> list = new ArrayList<>();
+        //添加假数据
+        MenuEntity menuEntity1 = new MenuEntity();
+        menuEntity1.iconId = R.mipmap.ic_launcher;
+        menuEntity1.titleColor = 0xff000000;
+        menuEntity1.title = "购物车";
+        MenuEntity menuEntity = new MenuEntity();
+        menuEntity.iconId = R.mipmap.ic_launcher;
+        menuEntity.titleColor = 0xffb3b3b3;
+        menuEntity.title = "货品";
+        list.add(menuEntity1);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        list.add(menuEntity);
+        // SweetSheet 控件,根据 rl 确认位置
+        mSweetSheet = new SweetSheet(rl);
+
+        //设置数据源 (数据源支持设置 list 数组,也支持从菜单中获取)
+        mSweetSheet.setMenuList(list);
+        //根据设置不同的 Delegate 来显示不同的风格.
+        mSweetSheet.setDelegate(new RecyclerViewDelegate(true));
+        //根据设置不同Effect 来显示背景效果BlurEffect:模糊效果.DimEffect 变暗效果
+        mSweetSheet.setBackgroundEffect(new BlurEffect(8));
+        //设置点击事件
+        mSweetSheet.setOnMenuItemClickListener(new SweetSheet.OnMenuItemClickListener() {
+            @Override
+            public boolean onItemClick(int position, MenuEntity menuEntity1) {
+                //即时改变当前项的颜色
+                list.get(position).titleColor = 0xff5823ff;
+                ((RecyclerViewDelegate) mSweetSheet.getDelegate()).notifyDataSetChanged();
+
+                //根据返回值, true 会关闭 SweetSheet ,false 则不会.
+                Toast.makeText(MainActivity.this, menuEntity1.title + "  " + position, Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
     }
 
 
