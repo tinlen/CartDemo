@@ -1,6 +1,6 @@
 # CartDemo
 
-![image](https://github.com/tinlen/CartDemo/blob/master/cartphoto.png)
+![image](https://github.com/tinlen/CartDemo/blob/master/cart1.gif)
 
 添加到购物车动画，
 细节没处理好。
