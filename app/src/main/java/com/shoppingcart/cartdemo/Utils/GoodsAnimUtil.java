@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
@@ -75,14 +76,12 @@ public class GoodsAnimUtil {
         endPointF.x = end_location[0]+mImgcar.getWidth()/2;
         endPointF.y = end_location[1]+mImgcar.getHeight()/2;
 
-        Log.d("红点","x:"+startPointF.x+" y:"+startPointF.y);
-
         PointF midPointF = new PointF();
         midPointF.x = endPointF.x;
-        midPointF.y = startPointF.y;
+        midPointF.y = startPointF.y-200;
 
         ValueAnimator animator = getCartValueAnimator(v, startPointF, midPointF, endPointF);
-        animator.setDuration(1200);
+        animator.setDuration(800);
         animator.start();
         animator.addListener(new Animator.AnimatorListener() {
             @Override
@@ -114,9 +113,9 @@ public class GoodsAnimUtil {
         CartEvaluator evaluator = new CartEvaluator(midP);
 
         ValueAnimator animator = ValueAnimator.ofObject(evaluator,startP,endP);
+        animator.setInterpolator(new AccelerateInterpolator());
         animator.addUpdateListener(new CartListener(targe));
         animator.setTarget(targe);
-        animator.setDuration(1000);
         return animator;
     }
 

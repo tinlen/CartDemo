@@ -26,6 +26,8 @@ import com.mingle.sweetpick.BlurEffect;
 import com.mingle.sweetpick.RecyclerViewDelegate;
 import com.mingle.sweetpick.SweetSheet;
 import com.shoppingcart.cartdemo.Adapter.CartAdapter;
+import com.shoppingcart.cartdemo.Adapter.CommonAdapter;
+import com.shoppingcart.cartdemo.Adapter.ViewHolder;
 import com.shoppingcart.cartdemo.Bean.Goods;
 import com.shoppingcart.cartdemo.Utils.GoodsAnimUtil;
 
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnEndAnimListener {
+public class MainActivity extends AppCompatActivity {
 
     private TextView tvNum;
     private int num = 0;
@@ -43,15 +45,16 @@ public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnE
     private ImageView iv;
     private SweetSheet mSweetSheet;
     private RelativeLayout rl;
+    private ListView goodsListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        GoodsAnimUtil.setOnEndAnimListener(this);
-
         initData();
+
+        goodsListView = (ListView) findViewById(R.id.lv_goods);
 
         rl = (RelativeLayout)findViewById(R.id.rl);
 
@@ -59,23 +62,37 @@ public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnE
 
         tvNum = (TextView) findViewById(R.id.m_list_num);
 
-        final Button button = (Button) findViewById(R.id.btn_buy);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GoodsAnimUtil.setAnim(MainActivity.this, button, iv);
-            }
-        });
-
         setupRecyclerView();
 
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSweetSheet.isShow()){
+                if (mSweetSheet.isShow()) {
                     mSweetSheet.dismiss();
                 }
                 mSweetSheet.toggle();
+            }
+        });
+        final List<Goods> goodsList= new ArrayList<>();
+        Goods goods = new Goods();
+        for(int i = 0;i<50;i++){
+            goods.price = new Random().nextInt(1000+i)+i;
+            goods.id = i;
+            goodsList.add(goods);
+        }
+
+        goodsListView.setAdapter(new CommonAdapter<Goods>(MainActivity.this,goodsList,R.layout.item_cart) {
+            @Override
+            public void convert(ViewHolder holder, Goods item) {
+                holder.setText(R.id.tv_price, item.price + "");
+                final Button buy = holder.getView(R.id.btn_addcart);
+                buy.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        GoodsAnimUtil.setAnim(MainActivity.this,buy,iv);
+                        GoodsAnimUtil.setOnEndAnimListener(new EndAnim());
+                    }
+                });
             }
         });
 
@@ -142,12 +159,6 @@ public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnE
         }
     }
 
-    @Override
-    public void onEndAnim() {
-        num++;
-        setNumAnim(tvNum);
-        tvNum.setText(num + "");
-    }
 
     private void setNumAnim(View view){
         AlphaAnimation alphaAnimation = new AlphaAnimation(1f,0f);
@@ -161,5 +172,15 @@ public class MainActivity extends AppCompatActivity implements GoodsAnimUtil.OnE
         view.setAnimation(set);
         set.startNow();
 
+    }
+
+    class EndAnim implements GoodsAnimUtil.OnEndAnimListener {
+
+        @Override
+        public void onEndAnim() {
+            num++;
+            setNumAnim(tvNum);
+            tvNum.setText(num + "");
+        }
     }
 }

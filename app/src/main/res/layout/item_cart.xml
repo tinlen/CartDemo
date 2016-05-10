@@ -11,11 +11,12 @@
         android:textSize="30sp"
         android:gravity="center"
         android:text="$ 100"/>
-    <CheckBox
+    <Button
         android:layout_centerVertical="true"
-        android:id="@+id/cb_addcart"
+        android:id="@+id/btn_addcart"
         android:padding="10dp"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="购买"/>
 </RelativeLayout>
